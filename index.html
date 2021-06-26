@@ -18,6 +18,18 @@
         font-family: "Tahoma", sans-serif;
         text-align: center;
         padding: 0.5em 0.5em 0.5em 0.5em;
+        border-radius: 0.5em;
+    }
+    button {
+        font-size: 1.5em;
+        margin: 1.5em 0.5em 0.5em 0.5em;
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        border-radius: 0.5em;
+        border: none;
+        font-family: "Tahoma", sans-serif;
+    }
+    button:hover {
+        background: lightgrey;
     }
     .fas {
         font-size: 3em;
@@ -27,29 +39,39 @@
     </head>
     <i class="fas fa-paperclip"></i>
     <h1>Somebody clip that</h1>
-    <input type="text" id="streamurl" placeholder="URL of Twitch stream">
+    <input type="text" id="streamurl" placeholder="URL of Twitch stream"></input>
+    <br>
+    <button onclick="startSpeechRecognition()">Start listening</button>
     <script>
-    var recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.onresult = function (event) {
-        let results = (event.results);
-        let newSpeech = results[results.length - 1][0].transcript;
-        console.log(newSpeech);
-        if (newSpeech.toLowerCase().includes("somebody clip that")) {
-            onClipRequested();
-        }
-    };
-    recognition.onnomatch = function (event) {
-        console.log("NO MATCH");
-    };
-    recognition.onerror = function (event) {
-        console.log("ERROR");
-    };
-    recognition.onspeechend = function () {
-        recognition.stop();
-    };
-    recognition.start();
+    window.onload = function() {
+        initSpeechRecognition();
+    }
 
+    function initSpeechRecognition() {
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.onresult = function (event) {
+            let results = (event.results);
+            let newSpeech = results[results.length - 1][0].transcript;
+            console.log(newSpeech);
+            if (newSpeech.toLowerCase().includes("somebody clip that")) {
+                onClipRequested();
+            }
+        };
+        recognition.onnomatch = function (event) {
+            console.log("NO MATCH");
+        };
+        recognition.onerror = function (event) {
+            console.log("ERROR");
+        };
+        recognition.onspeechend = function () {
+            recognition.stop();
+        };
+    }
+
+    function getStreamUrl() {
+        return document.getElementById("streamurl").value
+    }
 
     function onClipRequested() {
         console.log("onClipRequested");
