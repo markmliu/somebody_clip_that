@@ -43,12 +43,13 @@
     <br>
     <button onclick="startSpeechRecognition()">Start listening</button>
     <script>
+    var recognition = new webkitSpeechRecognition();
+
     window.onload = function() {
         initSpeechRecognition();
     }
 
     function initSpeechRecognition() {
-        var recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
         recognition.onresult = function (event) {
             let results = (event.results);
@@ -64,13 +65,14 @@
         recognition.onerror = function (event) {
             console.log("ERROR");
         };
-        recognition.onspeechend = function () {
-            recognition.stop();
-        };
+    }
+
+    function startSpeechRecognition() {
+        recognition.start();
     }
 
     function getStreamUrl() {
-        return document.getElementById("streamurl").value
+        return document.getElementById("streamurl").value;
     }
 
     function onClipRequested() {
