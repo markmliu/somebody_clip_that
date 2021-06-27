@@ -1,5 +1,9 @@
-# Save the client secret as SOMEBODY_CLIP_THAT_CLIENT_SECRET, then
-# `export SOMEBODY_CLIP_THAT_CLIENT_SECRET`
+# 1. Save the client secret as SOMEBODY_CLIP_THAT_CLIENT_SECRET,
+# 2. `export SOMEBODY_CLIP_THAT_CLIENT_SECRET`
+# 3. `export FLASK_APP=backend`
+# 4. `flask run`
+# 5. You'll be prompted to open your web browser and login with valid credentials
+# 6. /clip endpoint is now exposed and will clip using your credentials
 
 from flask import Flask
 from flask import request
