@@ -4,6 +4,7 @@
 </div>
 <button id="toggle" onclick="startSpeechRecognition()">start listening</button>
 <div class="clips"><ol id="myclips"></ol></div>
+<button id="logout" onclick="logout()">logout of Twitch</button>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
@@ -21,6 +22,11 @@ var response_info;
 window.onload = function() {
     initSpeechRecognition();
     access_token = getCookie("access_token");
+}
+
+function logout() {
+    document.cookie = "access_token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+    window.open('/', target="_self");
 }
 
 function initSpeechRecognition() {
