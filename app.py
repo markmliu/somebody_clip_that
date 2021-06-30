@@ -37,56 +37,22 @@ def get_access_token(code):
     print("access token: ", access_token)
     return access_token
 
-#TODO move this into client
-def get_broadcaster_id(username):
-    access_token = "get this from the client"
-    headers = {"Authorization": "Bearer " + access_token,
-               "Client-Id": CLIENT_ID}
-    url = "https://api.twitch.tv/helix/users"
-    params = {"login":username}
-    x = requests.get(url,params=params, headers=headers)
-    res = json.loads(x.text)
-    print(res)
-    return res["data"][0]["id"]
-
-#TODO move this into client
-def create_clip(broadcaster_id):
-    access_token = "get this from the client"
-    headers = {"Authorization": "Bearer " + access_token,
-               "Client-Id": CLIENT_ID}
-    url = "https://api.twitch.tv/helix/clips"
-    params = {"broadcaster_id":broadcaster_id}
-    x = requests.post(url,params=params,headers=headers)
-    return x.json()["data"][0]["id"]
-
 @app.route("/")
 def index():
     access_token = request.cookies.get('access_token')
     if access_token is None:
         return render_template('index.html', logged_in=False, login_link=get_login_link())
     else:
-        return render_template('index.html', logged_in=True)
+        return render_template('index.html', logged_in=True, client_id=CLIENT_ID)
 
 @app.route("/login")
 def login():
     code = request.args.get('code')
     print("code in url params:", code)
 
-    resp = make_response(render_template('index.html', logged_in=True))
+    resp = make_response(render_template('index.html', logged_in=True, client_id=CLIENT_ID))
     resp.set_cookie('access_token', get_access_token(code))
     return resp
-
-    #return render_template('index.html', logged_in=True, access_token=get_access_token(code))
-
-#TODO this endpoint can be removed
-@app.route("/clip")
-def clip():
-    username = "vgbootcamp"
-    broadcaster_id = get_broadcaster_id(username)
-    print("broadcaster id: ", broadcaster_id)
-    clip_id = create_clip(broadcaster_id)
-    print("created clip with id: ", clip_id)
-    return "Created clip"
 
 if __name__ == "__main__":
     app.jinja_env.auto_reload = True

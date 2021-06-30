@@ -1,6 +1,139 @@
-<div> you are logged in. the access token cookie is <span id="access_token">NULL</span>.</div>
-<br>
-<input type="text" id="stream_user" placeholder="streamer to clip"></input>
-<br>
-<button onclick="startspeechrecognition()">start listening</button>
-<script src="static/main.js"></script>
+<div id="streamerinfo">
+    <input type="text" id="stream_user" placeholder="streamer to clip"></input>
+    <img id="profile_img" src="static/nophoto.png" />
+</div>
+<button id="toggle" onclick="startSpeechRecognition()">start listening</button>
+<div class="clips"><ol id="myclips"></ol></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+var recognition = new webkitSpeechRecognition();
+var access_token = null;
+var broadcaster_id = null;
+var broadcaster_display_name = null;
+var my_clips = []
+
+const CLIENT_ID = "{{ client_id }}";
+
+// just for debugging
+var response_info;
+
+window.onload = function() {
+    initSpeechRecognition();
+    access_token = getCookie("access_token");
+}
+
+function initSpeechRecognition() {
+    recognition.continuous = true;
+    recognition.onresult = function (event) {
+        let results = (event.results);
+        let new_speech = results[results.length - 1][0].transcript;
+        console.log(new_speech);
+        if (new_speech.toLowerCase().includes("somebody clip that")) {
+            onHotwordDetected();
+        }
+    };
+    recognition.onnomatch = function (event) {
+        console.log("no match");
+    };
+    recognition.onerror = function (event) {
+        console.log("error");
+    };
+}
+
+function startSpeechRecognition() {
+    if (getStreamUser().length == 0) {
+        return;
+    }
+    $("#stream_user").prop("disabled", true);
+
+    $("#toggle").text("...");
+    recognition.start();
+    getBroadcastId();
+}
+
+function stopSpeechRecognition() {
+    $("#profile_img").attr("src", "static/nophoto.png");
+    $("#stream_user").prop("disabled", false);
+
+    $("#toggle").text("start listening");
+    $("#toggle").attr("onclick","startSpeechRecognition()");
+    recognition.stop();
+}
+
+function getStreamUser() {
+    return document.getElementById("stream_user").value;
+}
+
+function onHotwordDetected() {
+    console.log("onHotwordDetected");
+    createClip();
+}
+
+function getBroadcastId() {
+    $.get({
+          url: "https://api.twitch.tv/helix/users",
+          headers: {
+              "Authorization": "Bearer " + access_token,
+              "Client-Id": CLIENT_ID
+          },
+          data: {"login": getStreamUser() },
+    }).done(function(response) {
+        response_info = response;
+        console.log("getBroadcastId done. response_info=" + response_info);
+        if (response.data.length == 0) {
+            console.log("bad streamer username");
+            stopSpeechRecognition();
+        } else {
+            response_info = response;
+            broadcaster_id = response.data[0].id
+            broadcaster_display_name = response.data[0].display_name;
+            $("#toggle").text("stop clipping for " + broadcaster_display_name);
+            $("#toggle").attr("onclick","stopSpeechRecognition()");
+            $("#profile_img").attr("src", response.data[0].profile_image_url);
+        }
+    }).fail(function(response) {
+        console.log("getBroadcastId fail. response_info=" + response_info);
+        stopSpeechRecognition();
+    });
+}
+
+function createClip() {
+    $.post({
+          url: "https://api.twitch.tv/helix/clips",
+          headers: {
+              "Authorization": "Bearer " + access_token,
+              "Client-Id": CLIENT_ID
+          },
+          data: {"broadcaster_id": broadcaster_id },
+    }).done(function(response) {
+        response_info = response;
+        console.log("createClip done. response_info=" + response_info);
+        addClip(response_info.data[0].id);
+    }).fail(function(response) {
+        console.log("createClip fail. response_info=" + response_info);
+    });
+}
+
+function addClip(id) {
+    my_clips.push(id);
+    console.log("myclips=" + my_clips);
+    $("#myclips").append("<li><a target=_blank href=https://clips.twitch.tv/" + id +">" + id + "</a></li>");
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decoded_cookie = decodeURIComponent(document.cookie);
+    let ca = decoded_cookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+</script>
