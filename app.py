@@ -7,7 +7,8 @@ import json
 import requests
 
 CLIENT_ID = "iliayvc79au07dbm3hk21a0f1y730k"
-#TODO this url needs to be the server's URL, instead of hardcoded as localhost
+#TODO this url shouldn't be hardcoded
+#REDIRECT_URL = "http://localhost:5000/login"
 REDIRECT_URL = "https://somebodyclipthat-nekfxpjbea-uw.a.run.app/login"
 SCOPE = "clips:edit user:read:email"
 CLIENT_SECRET = ""
@@ -61,5 +62,5 @@ if __name__ == "__main__":
 
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    server_port = os.environ.get('PORT', '8080')
+    server_port = os.environ.get('PORT', '5000')
     app.run(debug=True, host='0.0.0.0', port=server_port)

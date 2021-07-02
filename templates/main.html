@@ -18,6 +18,7 @@ const CLIENT_ID = "{{ client_id }}";
 
 // just for debugging
 var response_info;
+var recognition_event;
 
 window.onload = function() {
     initSpeechRecognition();
@@ -32,6 +33,7 @@ function logout() {
 function initSpeechRecognition() {
     recognition.continuous = true;
     recognition.onresult = function (event) {
+        recognition_event = event;
         let results = (event.results);
         let new_speech = results[results.length - 1][0].transcript;
         console.log(new_speech);
@@ -39,12 +41,19 @@ function initSpeechRecognition() {
             onHotwordDetected();
         }
     };
-    recognition.onnomatch = function (event) {
+    recognition.onnomatch = function(event) {
         console.log("no match");
+        recognition_event = event;
     };
-    recognition.onerror = function (event) {
+    recognition.onerror = function(event) {
         console.log("error");
+        recognition_event = event;
     };
+    recognition.onend = function(event) {
+        console.log("onend");
+        recognition_event = event;
+        recognition.start();
+    }
 }
 
 function startSpeechRecognition() {
