@@ -8,8 +8,7 @@ import requests
 
 CLIENT_ID = "iliayvc79au07dbm3hk21a0f1y730k"
 #TODO this url needs to be the server's URL, instead of hardcoded as localhost
-REDIRECT_URL = "http://localhost:5000/login"
-CLIENT_SECRET = ""
+REDIRECT_URL = "https://somebodyclipthat-nekfxpjbea-uw.a.run.app/login"
 SCOPE = "clips:edit user:read:email"
 
 def get_login_link():
@@ -56,7 +55,7 @@ def login():
     access_token = get_access_token(code, url)
     if access_token:
         resp = make_response(render_template('index.html', logged_in=True, client_id=CLIENT_ID))
-        resp.set_cookie('access_token', get_access_token(code, url))
+        resp.set_cookie('access_token', access_token)
         return resp
     else:
         return render_template('index.html', logged_in=False, error=True, client_id=CLIENT_ID)
