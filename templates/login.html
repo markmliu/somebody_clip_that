@@ -1,7 +1,14 @@
 <button id="login" onclick="login()">login to Twitch</button>
 <script>
+BASE_URL = "https://id.twitch.tv/oauth2/authorize?client_id="
+CLIENT_ID = "iliayvc79au07dbm3hk21a0f1y730k"
+SCOPE = "clips:edit user:read:email"
+
 function login() {
     document.getElementById("login").textContent = "logging in...";
-    window.open("{{ login_link }}", target="_self");
+    login_url = BASE_URL + CLIENT_ID
+            + "&redirect_uri="+ location.protocol+ '//' + location.host + location.pathname + "login"
+            + "&response_type=code&scope=" + SCOPE;
+    window.open(login_url, target="_self");
 }
 </script>
