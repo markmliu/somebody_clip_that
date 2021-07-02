@@ -17,7 +17,9 @@ def get_login_link():
 
 app = Flask(__name__, template_folder="templates")
 
-def get_access_token(code):
+def get_access_token(code, redirect_url):
+    print("redirect_url =", redirect_url)
+    print("REDIRECT_URL =", REDIRECT_URL)
     url = "https://id.twitch.tv/oauth2/token"
     params = {"client_id":CLIENT_ID,
               "client_secret":CLIENT_SECRET,
@@ -26,15 +28,14 @@ def get_access_token(code):
               "redirect_uri":REDIRECT_URL}
     x = requests.post(url,params=params)
 
-    print(x.json())
     access_token = x.json().get("access_token", "")
-    print("access token: ", access_token)
     return access_token
 
 @app.route("/")
 def index():
     access_token = request.cookies.get('access_token')
-    print("url=", request.url.split('?')[0])
+    redirect_url = request.url.split('?')[0]
+    print("redirect_url =", redirect_url)
     if access_token is None:
         return render_template('index.html', logged_in=False, login_link=get_login_link())
     else:
@@ -43,11 +44,8 @@ def index():
 @app.route("/login")
 def login():
     code = request.args.get('code')
-    url = request.url.split('?')[0]
-    print("code in url params:", code)
-    print("url:", url)
-
-    access_token = get_access_token(code)
+    redirect_url = request.url.split('?')[0]
+    access_token = get_access_token(code, redirect_url)
     if access_token:
         resp = make_response(render_template('index.html', logged_in=True, client_id=CLIENT_ID))
         resp.set_cookie('access_token', access_token)
