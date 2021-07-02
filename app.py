@@ -20,6 +20,8 @@ def get_access_token(code, redirect_url):
     x = requests.post(url,params=params)
 
     print(x.json())
+    if x.json()["access_token"] is None:
+        return ""
     access_token = x.json()["access_token"]
     print("access token: ", access_token)
     return access_token
