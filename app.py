@@ -7,6 +7,20 @@ import json
 import requests
 
 CLIENT_ID = "iliayvc79au07dbm3hk21a0f1y730k"
+#TODO this url needs to be the server's URL, instead of hardcoded as localhost
+REDIRECT_URL = "http://localhost:5000/login"
+CLIENT_SECRET = ""
+SCOPE = "clips:edit user:read:email"
+
+def get_login_link():
+    # read client secret from env variable
+    global CLIENT_SECRET
+    CLIENT_SECRET = os.environ["SOMEBODY_CLIP_THAT_CLIENT_SECRET"]
+    print ("client secret: ", CLIENT_SECRET)
+
+    login_url = "https://id.twitch.tv/oauth2/authorize?client_id="+CLIENT_ID+"&redirect_uri="+REDIRECT_URL+"&response_type=code&scope="+SCOPE
+    return login_url
+
 
 app = Flask(__name__, template_folder="templates")
 
@@ -27,8 +41,8 @@ def get_access_token(code, redirect_url):
 @app.route("/")
 def index():
     access_token = request.cookies.get('access_token')
-    if not access_token:
-        return render_template('index.html', logged_in=False)
+    if access_token is None:
+        return render_template('index.html', logged_in=False, login_link=get_login_link())
     else:
         return render_template('index.html', logged_in=True, client_id=CLIENT_ID)
 
