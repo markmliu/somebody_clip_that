@@ -20,16 +20,14 @@ def get_access_token(code, redirect_url):
     x = requests.post(url,params=params)
 
     print(x.json())
-    if x.json()["access_token"] is None:
-        return ""
-    access_token = x.json()["access_token"]
+    access_token = x.json().get("access_token", "")
     print("access token: ", access_token)
     return access_token
 
 @app.route("/")
 def index():
     access_token = request.cookies.get('access_token')
-    if access_token is None:
+    if not access_token:
         return render_template('index.html', logged_in=False)
     else:
         return render_template('index.html', logged_in=True, client_id=CLIENT_ID)
@@ -41,9 +39,14 @@ def login():
     print("code in url params:", code)
     print("url:", url)
 
-    resp = make_response(render_template('index.html', logged_in=True, client_id=CLIENT_ID))
-    resp.set_cookie('access_token', get_access_token(code, url))
-    return resp
+    access_token = get_access_token(code, url)
+    if access_token:
+        resp = make_response(render_template('index.html', logged_in=True, client_id=CLIENT_ID))
+        resp.set_cookie('access_token', get_access_token(code, url))
+        return resp
+    else:
+        return render_template('index.html', logged_in=False, error=True, client_id=CLIENT_ID)
+
 
 if __name__ == "__main__":
     # read client secret from env variable

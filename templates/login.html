@@ -1,4 +1,7 @@
 <button id="login" onclick="login()">login to Twitch</button>
+{% if error %}
+<div>Error logging in</div>
+{% endif %}
 <script>
 BASE_URL = "https://id.twitch.tv/oauth2/authorize?client_id="
 CLIENT_ID = "iliayvc79au07dbm3hk21a0f1y730k"
