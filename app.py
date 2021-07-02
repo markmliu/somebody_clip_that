@@ -28,7 +28,7 @@ def get_access_token(code):
 def index():
     access_token = request.cookies.get('access_token')
     if access_token is None:
-        return render_template('index.html', logged_in=False
+        return render_template('index.html', logged_in=False)
     else:
         return render_template('index.html', logged_in=True, client_id=CLIENT_ID)
 
