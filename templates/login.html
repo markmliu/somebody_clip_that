@@ -6,9 +6,10 @@ SCOPE = "clips:edit user:read:email"
 
 function login() {
     document.getElementById("login").textContent = "logging in...";
-    login_url = BASE_URL + CLIENT_ID
-            + "&redirect_uri="+ location.protocol+ '//' + location.host + location.pathname + "login"
-            + "&response_type=code&scope=" + SCOPE;
+    login_url = {{ login_link }};
+    //login_url = BASE_URL + CLIENT_ID
+            //+ "&redirect_uri="+ location.protocol+ '//' + location.host + location.pathname + "login"
+            //+ "&response_type=code&scope=" + SCOPE;
     window.open(login_url, target="_self");
 }
 </script>
