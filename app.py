@@ -10,13 +10,13 @@ CLIENT_ID = "iliayvc79au07dbm3hk21a0f1y730k"
 
 app = Flask(__name__, template_folder="templates")
 
-def get_access_token(code):
+def get_access_token(code, redirect_url):
     url = "https://id.twitch.tv/oauth2/token"
     params = {"client_id":CLIENT_ID,
               "client_secret":CLIENT_SECRET,
               "code":code,
               "grant_type":"authorization_code",
-              "redirect_uri":REDIRECT_URL}
+              "redirect_uri":redirect_url}
     x = requests.post(url,params=params)
 
     print(x.json())
@@ -35,10 +35,12 @@ def index():
 @app.route("/login")
 def login():
     code = request.args.get('code')
+    url = request.url.split('?')[0]
     print("code in url params:", code)
+    print("url:", url)
 
     resp = make_response(render_template('index.html', logged_in=True, client_id=CLIENT_ID))
-    resp.set_cookie('access_token', get_access_token(code))
+    resp.set_cookie('access_token', get_access_token(code, url))
     return resp
 
 if __name__ == "__main__":
